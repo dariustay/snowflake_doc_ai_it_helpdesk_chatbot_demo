@@ -31,7 +31,8 @@ def query_cortex_search_service(query: str, service: str, limit: int, metadata: 
                 'FILE_NAME',
                 'TITLE_VALUE',
                 'LAST_UPDATED_VALUE',
-                'APPLIES_TO_VALUE'
+                'APPLIES_TO_VALUE',
+                'SNOWFLAKE_FILE_URL'
             ],
             limit=limit
         )
@@ -47,6 +48,7 @@ def query_cortex_search_service(query: str, service: str, limit: int, metadata: 
             "title": rec["TITLE_VALUE"],
             "last_updated": rec["LAST_UPDATED_VALUE"],
             "applies_to": rec['APPLIES_TO_VALUE'],
+            "file_url":     rec["SNOWFLAKE_FILE_URL"]
         }
         for rec in resp.results
     ]

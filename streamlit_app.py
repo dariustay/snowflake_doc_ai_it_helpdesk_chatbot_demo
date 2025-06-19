@@ -1,5 +1,6 @@
 import json
 import streamlit as st
+import pypdfium2 as pdfium
 from typing import Any, Dict, List
 from utils.snowflake_utils import session, root
 from utils.llm_utils import get_invoice_answer, refine_question
@@ -49,7 +50,7 @@ def load_config() -> Dict[str, Any]:
         svc_names = [m["name"] for m in st.session_state.service_metadata]
         selected_service = st.selectbox("Service:", svc_names)
         num_retrieved_chunks = st.number_input(
-            "Chunks to retrieve:", min_value=1, max_value=10, value=5
+            "Chunks to retrieve:", min_value=1, max_value=10, value=3
         )
 
     # Chat and LLM settings UI
@@ -87,6 +88,18 @@ def init_messages() -> None:
         
     if "messages" not in st.session_state:
         st.session_state.messages = []
+
+
+def display_pdf_page(key: str):
+    """
+    Render the first page of the PDF in session state.
+    """
+    
+    pdf = st.session_state[key]
+    page = pdf.get_page(0)
+    bitmap = page.render(scale=2)
+    st.image(bitmap.to_pil(), use_container_width=True)
+    page.close()
 
 
 def main_chat_loop(config: Dict[str, Any], model: str) -> None:
@@ -154,12 +167,16 @@ def main_chat_loop(config: Dict[str, Any], model: str) -> None:
         if chunks:
             for idx, c in enumerate(chunks, start=1):
                 with st.expander(f"Result {idx}: {c['file']}"):
-                    st.write(c['chunk'])
-                    st.write(
-                        f"**Title:** {c['title']}  \n"
-                        f"**Last Updated:** {c['last_updated']}  \n"
-                        f"**Applies To:** {c['applies_to']}"
-                    )
+                    
+                    # Load PDF once per file
+                    key = f"pdf_doc_{c['file']}"
+                    if key not in st.session_state:
+                        stage_ref = f"@{session.get_current_database()}.{session.get_current_schema()}.DOC_AI_STAGE/{c['file']}"
+                        raw_bytes = session.file.get_stream(stage_ref).read()
+                        st.session_state[key] = pdfium.PdfDocument(raw_bytes)
+                    
+                    # Display only first page
+                    display_pdf_page(key)
         else:
             st.info("No search results found.")
 
