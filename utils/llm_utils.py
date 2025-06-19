@@ -10,9 +10,14 @@ def _build_refine_prompt(raw_question: str, chat_history: str) -> str:
     """
     
     system = """
-    You are a query refiner. 
-    Given the recent chat history and a user question, produce a cleaner, more focused question preserving the user's intent.
-    Output ONLY the rewritten question.
+    You are a query refiner.
+    
+    Given the recent chat history and a user input, produce a clear, focused question that preserves the user's intent.
+    1. If the input is already a question, clean it up with the necessary context from the chat history if it's relevant.
+    2. If the input is a problem statement or request for help, rewrite it as a question that directly asks how to solve or troubleshoot the issue (e.g., “How can I […]?”).
+    3. Preserve the original meaning and keywords; do not add new information.
+    
+    Output ONLY the rewritten question, ending with a question mark. — no extra comments and no follow-up questions.
     """
     return "\n".join([
         "[SYSTEM]",
