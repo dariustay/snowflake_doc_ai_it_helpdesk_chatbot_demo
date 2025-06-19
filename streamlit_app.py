@@ -58,17 +58,6 @@ def load_config() -> Dict[str, Any]:
             "History turns:", min_value=1, max_value=10, value=5
         )
 
-    # Chat filters UI
-    with st.sidebar.expander("⚙️ Chat Filters", expanded=False):
-        min_total_gross, max_total_gross = st.slider(
-            "Total gross range:",
-            min_value=0.0,
-            max_value=1_000_000.0,
-            value=(0.0, 1_000_000.0),
-            step=1_000.0,
-            format="%.2f"
-        )
-
     st.sidebar.markdown("---")
     
     # Clear conversation button
@@ -84,8 +73,6 @@ def load_config() -> Dict[str, Any]:
         "refine_max_tokens": REFINE_MAX_TOKENS,
         "summary_temperature": SUMMARY_TEMPERATURE,
         "summary_max_tokens": SUMMARY_MAX_TOKENS,
-        "min_total_gross": min_total_gross,
-        "max_total_gross": max_total_gross,
     }
 
 
@@ -134,8 +121,6 @@ def main_chat_loop(config: Dict[str, Any], model: str) -> None:
             service=config['selected_service'],
             limit=config['num_retrieved_chunks'],
             metadata=st.session_state.service_metadata,
-            min_total_gross=config['min_total_gross'],
-            max_total_gross=config['max_total_gross'],
         )
         st.session_state.last_context_json = json.dumps(chunks)
 
@@ -171,10 +156,9 @@ def main_chat_loop(config: Dict[str, Any], model: str) -> None:
                 with st.expander(f"Result {idx}: {c['file']}"):
                     st.write(c['chunk'])
                     st.write(
-                        f"**Seller:** {c['seller']}  \n"
-                        f"**Client:** {c['client']}  \n"
-                        f"**Total Gross:** {c['total_gross']}  \n"
-                        f"**Issue Date:** {c['issue_date']}"
+                        f"**Title:** {c['title']}  \n"
+                        f"**Last Updated:** {c['last_updated']}  \n"
+                        f"**Applies To:** {c['applies_to']}"
                     )
         else:
             st.info("No search results found.")
@@ -189,8 +173,8 @@ def main() -> None:
     
     init_messages()
     config = load_config()
-    st.title("Invoice Chatbot")
-    st.write("💬 Ask questions about your invoices powered by Cortex Search.")
+    st.title("IT HelpDesk Chatbot")
+    st.write("💬 Ask questions about IT-related issues powered by Cortex Search.")
     st.write("")
     main_chat_loop(config, model=MODEL)
 

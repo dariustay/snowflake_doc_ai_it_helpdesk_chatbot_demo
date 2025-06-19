@@ -30,9 +30,6 @@ def _build_refine_prompt(raw_question: str, chat_history: str) -> str:
 def refine_question(raw_question: str, model_name: str, num_history: int, temperature: float, max_tokens: int) -> str:
     """
     Optionally rewrite the user's question for clarity and focus.
-
-    If chat history is enabled and available, calls the refiner LLM.
-    Otherwise returns the original question.
     """
     
     if len(st.session_state.messages) < 2:
@@ -69,11 +66,9 @@ def _build_invoice_prompt(context_json: str, question: str, chat_history: str = 
     When you need to return multiple discrete pieces of information, format it as a Markdown list:
     - Always put a blank line before and after the list.
     - Start each bullet with `- ` (dash + space).
-    - Put each financial line (net worth, VAT, gross worth, etc.) on its own line.
     
     Otherwise, respond in normal prose.
     
-    Always format money with a leading ‘$’, commas for thousands, and two decimal places.  
     If you cannot answer from the context, say “I don't know.”
     """
     parts = ["[SYSTEM]", system, "[/SYSTEM]", f"[CONTEXT]\n{context_json}\n[/CONTEXT]"]
