@@ -65,7 +65,8 @@ def _build_invoice_prompt(context_json: str, question: str, chat_history: str = 
     """
     
     system = """
-    You are an invoice assistant. Answer the user's question using ONLY the data in the JSON context below. Be concise and factual.  
+    You are an invoice assistant.
+    Answer the user's question using ONLY the data in the JSON context below. Be concise and factual.  
     Output must be valid Markdown.
     
     When you need to return multiple discrete pieces of information, format it as a Markdown list:
