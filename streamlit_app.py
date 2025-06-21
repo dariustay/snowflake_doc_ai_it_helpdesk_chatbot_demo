@@ -168,6 +168,11 @@ def main_chat_loop(config: Dict[str, Any], model: str) -> None:
             for idx, c in enumerate(chunks, start=1):
                 with st.expander(f"Result {idx}: {c['file']}"):
                     
+                    st.write(
+                        f"**Last Updated:** {c['last_updated']}  \n"
+                        f"**Applies To:** {c['applies_to']}  \n"
+                    )
+                    
                     # Load PDF once per file
                     key = f"pdf_doc_{c['file']}"
                     if key not in st.session_state:
